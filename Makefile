@@ -1,4 +1,7 @@
-# Makefile for COS217_A3
+# Author: Nicholas Budny
+
+# Makefile for COS217 Assignment 3
+# Symbol Table implementation with linked list and hash table
 
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -pedantic -g
