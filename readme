@@ -47,7 +47,8 @@ Nicholas Budny
 ------------------------------------------------------------------------
 What is your assessment of the assignment? Was it helpful? Was it fun?
 
-
+It was not very fun, but maybe ask me again after I cool off from the grind. 
+Helpful for ADTs and symbol table understanding. 
 
 ------------------------------------------------------------------------
 (optional) What information can you provide about your submission that
@@ -58,17 +59,21 @@ No bugs, but see below about the splint & critTer warnings
 
 
 ------------------------------------------------------------------------
-What warnings does splint generate on symtablelist.c, and what are your
-disagreements with them? Copy the splint warnings here, and express your
-disagreement after each warning. If there are no warnings, then write
-"None."
+What warnings does splint generate on symtablelist.c, and what are your disagreements with them? 
+Copy the splint warnings here, and express your disagreement after each warning. 
+If there are no warnings, then write "None."
 
-1) symtablelist.c: (in function SymTable_map) symtablelist.c:217:9: Statement has no effect: pfApply(pCurrent...
-    Explanation: This warning occurs because Splint cannot detect the side effects that occur within the client-provided pfApply function. The function is correctly implemented as it applies the client's function to each binding in the table. Any side effects occur within the client's function rather than in our code, which is the intended design of the map function.
-2) symtablehash.c: (in function expandTable) symtablehash.c:88:31: Value ppNewBuckets[] used before definition
-    Explanation: This is a false positive. The code correctly allocates memory for ppNewBuckets with malloc(), checks if the allocation was successful with a null check, and only then uses the array in the initialization loop. There is no execution path where ppNewBuckets would be used without proper initialization.
-3) symtablehash.c: (in function SymTable_map) symtablehash.c:338:13: Statement has no effect: pfApply(pCurrent...
-    Explanation: Same as with the linked list implementation, this warning appears because Splint cannot detect side effects in the client-provided pfApply function.
+1)   symtablelist.c: (in function SymTable_map)
+        symtablelist.c:217:9: Statement has no effect: pfApply(pCurrent...
+          Statement has no visible effect --- no values are modified. (Use -noeffect to
+          inhibit warning)
+    Disagreement:
+    My client-provided pfApply function is correctly implemented because it applies the client's function to each binding in the table. 
+    Any side effects occur within the client's function rather than in my code, 
+    which is the intended design of the map function. 
+    From my understanding, Splint can't trace the potential modifications or actions that could happen 
+    when control is passed to an external function provided by the client.
+
 
 ------------------------------------------------------------------------
 What warnings does critTer generate on symtablelist.c, and what are your
@@ -76,6 +81,28 @@ disagreements with them? Copy the critTer warnings here, and express
 your disagreement after each warning. If there are no warnings, then
 write "None."
 
+symtablelist.c: line 78: medium priority:
+Do you want to validate 'pvValue' through an assert?
+
+symtablelist.c: line 119: medium priority:
+Do you want to validate 'pvValue' through an assert?
+
+symtablelist.c: line 215: medium priority:
+Do you want to validate 'pvExtra' through an assert?
+
+symtablelist.c: line 20: high priority: 
+A comment should appear above each global variable.
+
+pvValue assert disagreements: The SymTable ADT is designed to accept NULL values for the pvValue parameter, 
+so adding an assertion would unnecessarily restrict valid use cases. 
+The assignment specs do not prohibit NULL values for pvValue.
+
+pvExtra assert disagreement: The pvExtra parameter can legitimately be NULL, 
+as it's an optional extra parameter passed to the client's function. 
+Adding an assertion would unnecessarily restrict valid use cases.
+
+Global variable comment disagreement: I'm using inline comments for struct fields for better readability and code organization. 
+This is a common and acceptable style in C programming.
 
 
 ------------------------------------------------------------------------
@@ -84,6 +111,24 @@ disagreements with them? Copy the splint warnings here, and express your
 disagreement after each warning. If there are no warnings, then write
 "None."
 
+1) symtablehash.c: (in function SymTable_expandTable)
+    symtablehash.c:103:31: Value ppNewBuckets[] used before definition
+      An rvalue is used that may not be initialized to a value on some execution
+      path. (Use -usedef to inhibit warning)
+    
+      Disagreement: This is a false positive. The code correctly allocates memory for ppNewBuckets with malloc(), 
+      checks if the allocation was successful with a null check, and only then uses the array in the initialization loop. 
+      There is no situation where ppNewBuckets would be used without proper initialization, which is 
+      what the warning is about. 
+    
+2)  symtablehash.c: (in function SymTable_map)
+    symtablehash.c:353:13: Statement has no effect: pfApply(pCurrent...
+      Statement has no visible effect --- no values are modified. (Use -noeffect to
+      inhibit warning)
+
+      Disagreement: Same as with the linked list implementation, 
+      this warning appears because Splint cannot detect side effects 
+      in the client-provided pfApply function.
 
 
 ------------------------------------------------------------------------
@@ -91,6 +136,28 @@ What warnings does critTer generate on symtablehash.c, and what are your
 disagreements with them? Copy the critTer warnings here, and express
 your disagreement after each warning. If there are no warnings, then
 write "None."
+
+symtablehash.c: line 182: medium priority:
+Do you want to validate 'pvValue' through an assert?
+
+symtablehash.c: line 231: medium priority:
+Do you want to validate 'pvValue' through an assert?
+
+symtablehash.c: line 343: medium priority:
+Do you want to validate 'pvExtra' through an assert?
+
+symtablehash.c: line 26: high priority: 
+A comment should appear above each global variable.
+
+pvValue assert disagreement: Same as for the linked list implementation. 
+The SymTable ADT is designed to accept NULL values for the pvValue parameter, 
+so adding an assertion would unnecessarily restrict valid use cases.
+
+pvExtra assert disagreement: Same as for the linked list implementation. 
+The pvExtra parameter can legitimately be NULL, as it's an optional extra parameter.
+
+Global variable comment disagreement: I'm using inline comments for struct fields for better readability and code organization. 
+This is a common and acceptable style in C programming.
 
 
 
@@ -105,18 +172,18 @@ The linked list implementation with:
 -- 500 bindings consumed 0.000000 seconds.
 -- 5000 bindings consumed 0.373748 seconds.
 -- 50000 bindings consumed 38.613752 seconds.
--- 500000 bindings consumed ________ seconds.
+-- 500000 bindings consumed > 5 mins.
 
 The non-expanding hash table implementation with:
--- 50 bindings consumed ________ seconds.
--- 500 bindings consumed ________ seconds.
--- 5000 bindings consumed ________ seconds.
--- 50000 bindings consumed ________ seconds.
--- 500000 bindings consumed ________ seconds.
+-- 50 bindings consumed 0.000000 seconds.
+-- 500 bindings consumed 0.000000 seconds.
+-- 5000 bindings consumed 0.003534 seconds.
+-- 50000 bindings consumed 0.109438 seconds.
+-- 500000 bindings consumed 2.530924 seconds.
 
 The expanding hash table implementation with:
--- 50 bindings consumed ________ seconds.
--- 500 bindings consumed ________ seconds.
--- 5000 bindings consumed ________ seconds.
--- 50000 bindings consumed ________ seconds.
--- 500000 bindings consumed ________ seconds.
+-- 50 bindings consumed 0.000000 seconds.
+-- 500 bindings consumed 0.000000 seconds.
+-- 5000 bindings consumed 0.002786 seconds.
+-- 50000 bindings consumed 0.045088 seconds.
+-- 500000 bindings consumed 0.756729 seconds.
