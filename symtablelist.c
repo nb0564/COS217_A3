@@ -7,6 +7,9 @@
 #include <string.h>
 #include "symtable.h"
 
+/* A Binding structure represents a single key-value binding in the table.
+ * Each node in the linked list is a Binding.
+ */
 typedef struct Binding {
     /* Defensive copy of the key string */
     char *pcKey;
@@ -16,6 +19,9 @@ typedef struct Binding {
     struct Binding *pNext;
 } Binding;
 
+/* The SymTable structure represents the entire symbol table.
+ * It maintains a pointer to the first binding and a count of bindings.
+ */
 struct SymTable {
     /* Head of the linked list of bindings */
     Binding *pHead;

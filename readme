@@ -63,7 +63,12 @@ disagreements with them? Copy the splint warnings here, and express your
 disagreement after each warning. If there are no warnings, then write
 "None."
 
-
+1) symtablelist.c: (in function SymTable_map) symtablelist.c:217:9: Statement has no effect: pfApply(pCurrent...
+    Explanation: This warning occurs because Splint cannot detect the side effects that occur within the client-provided pfApply function. The function is correctly implemented as it applies the client's function to each binding in the table. Any side effects occur within the client's function rather than in our code, which is the intended design of the map function.
+2) symtablehash.c: (in function expandTable) symtablehash.c:88:31: Value ppNewBuckets[] used before definition
+    Explanation: This is a false positive. The code correctly allocates memory for ppNewBuckets with malloc(), checks if the allocation was successful with a null check, and only then uses the array in the initialization loop. There is no execution path where ppNewBuckets would be used without proper initialization.
+3) symtablehash.c: (in function SymTable_map) symtablehash.c:338:13: Statement has no effect: pfApply(pCurrent...
+    Explanation: Same as with the linked list implementation, this warning appears because Splint cannot detect side effects in the client-provided pfApply function.
 
 ------------------------------------------------------------------------
 What warnings does critTer generate on symtablelist.c, and what are your
@@ -96,10 +101,10 @@ implementation, (2) your non-expanding hash table implementation, and
 (3) your expanding hash table implementation? Fill in the blanks.
 
 The linked list implementation with:
--- 50 bindings consumed ________ seconds.
--- 500 bindings consumed ________ seconds.
--- 5000 bindings consumed ________ seconds.
--- 50000 bindings consumed ________ seconds.
+-- 50 bindings consumed .000000 seconds.
+-- 500 bindings consumed 0.000000 seconds.
+-- 5000 bindings consumed 0.373748 seconds.
+-- 50000 bindings consumed 38.613752 seconds.
 -- 500000 bindings consumed ________ seconds.
 
 The non-expanding hash table implementation with:

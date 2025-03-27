@@ -7,12 +7,15 @@
 #include <string.h>
 #include "symtable.h"
 
-/* Array of primes close to powers of 2 for bucket counts */
+/* Array of prime numbers for bucket counts during hash table expansion */
 static const size_t primes[] = {509, 1021, 2039, 4093, 8191, 16381, 32749, 65521};
 
 /* Number of elements in the primes array */
 static const size_t numPrimes = sizeof(primes) / sizeof(primes[0]);
 
+/* A Binding structure represents a single key-value binding in the table.
+ * Each node in the bucket's linked list is a Binding.
+ */
 typedef struct Binding {
     /* Defensive copy of the key string */
     char *pcKey;
@@ -22,6 +25,9 @@ typedef struct Binding {
     struct Binding *pNext;
 } Binding;
 
+/* The SymTable structure represents the entire hash table.
+ * It maintains the array of buckets, counts, and current size info.
+ */
 struct SymTable {
     /* Array of bucket pointers (each bucket is a list) */
     Binding **ppBuckets;
@@ -33,6 +39,10 @@ struct SymTable {
     size_t uPrimeIndex;
 };
 
+/* Computes a hash value for pcKey, returning a value between 0 and uBucketCount-1.
+ * Uses the hash function specified in the assignment.
+ * pcKey must not be NULL.
+ */
 static size_t SymTable_hash(const char *pcKey, size_t uBucketCount) {
     const size_t HASH_MULTIPLIER = 65599;
     size_t uHash = 0;
@@ -47,7 +57,12 @@ static size_t SymTable_hash(const char *pcKey, size_t uBucketCount) {
     return uHash % uBucketCount;
 }
 
-static int expandTable(SymTable_T oSymTable) {
+/* Expands the hash table by increasing bucket count and rehashing all bindings.
+ * Returns 1 if successful, 0 if memory allocation fails.
+ * If already at maximum bucket count, returns 1 without expansion.
+ * oSymTable must not be NULL.
+ */
+static int SymTable_expandTable(SymTable_T oSymTable) {
     size_t uNewPrimeIndex;
     size_t uNewBucketCount;
     size_t i;
@@ -208,7 +223,7 @@ int SymTable_put(SymTable_T oSymTable, const char *pcKey, const void *pvValue) {
     
     /* Check if expansion is needed (bindings > buckets) */
     if (oSymTable->uLength > oSymTable->uBucketCount)
-        expandTable(oSymTable);
+        SymTable_expandTable(oSymTable);
     
     return 1;
 }
